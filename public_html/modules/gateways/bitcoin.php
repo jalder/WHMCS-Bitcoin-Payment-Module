@@ -14,11 +14,13 @@ function bitcoin_config() {
 	return $configarray;
 }
 
-function bitcoin_capture($params) {
+function bitcoin_link($params) {
 
     # Gateway Specific Variables
-	$gatewayusername = $params['username'];
-	$gatewaytestmode = $params['testmode'];
+	$u = $params['username'];
+	$p = $params['password'];
+	$h = $params['host'].':'.$params['port'];
+	$rpc = 'http://'.$u.':'.$p.'@'.$h;
 
     # Invoice Variables
 	$invoiceid = $params['invoiceid'];
@@ -37,26 +39,18 @@ function bitcoin_capture($params) {
 	$country = $params['clientdetails']['country'];
 	$phone = $params['clientdetails']['phonenumber'];
 
-	# Card Details
-	$cardtype = $params['cardtype'];
-	$cardnumber = $params['cardnum'];
-	$cardexpiry = $params['cardexp']; # Format: MMYY
-	$cardstart = $params['cardstart']; # Format: MMYY
-	$cardissuenum = $params['cardissuenum'];
-
-	# Perform Transaction Here & Generate $results Array, eg:
-	$results = array();
-	$results["status"] = "success";
-    $results["transid"] = "12345";
-
-	# Return Results
-	if ($results["status"]=="success") {
-		return array("status"=>"success","transid"=>$results["transid"],"rawdata"=>$results);
-	} elseif ($gatewayresult=="declined") {
-        return array("status"=>"declined","rawdata"=>$results);
-    } else {
-		return array("status"=>"error","rawdata"=>$results);
+	# Build Bitcoin Information Here
+	require_once 'bitcoin/jsonRPCClient.php';
+	$bitcoin = new jsonRPCClient($rpc); 
+	if(!$bitcoin->getinfo()){
+		die('could not connect to bitcoind');
 	}
+	$address = $bitcoin->getaccountaddress($params['clientdetails']['userid'].'-'.$invoiceid);
+	
+	# Enter your code submit to the gateway...
+	$code = 'Send Payments to: '.$address.'';
+
+	return $code;
 
 }
 
