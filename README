@@ -1,0 +1,8 @@
+Move files in public_html into your WHMCS installation root.
+File found at modules/gateways/callback/bitcoin.php should be ran as a cron job.  Run it as frequently as you want to check for payments.  When payments match invoice amount, invoice is marked as Paid. Bitcoin receiving address is marked on invoice as transaction.
+
+Features unique payment address and account (accounts are named after %userid%-%invoiceid%) for each invoice.
+Connects to bitcoind rpc instance.  Currently only over http.
+
+Future developments:
+WHMCS bitcoin module add on for reviewing bitcoin wallet and sending credits back to clients from admin.
